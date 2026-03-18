@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UCC HostelFinder</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --nv:#0B1F4E;--nv2:#1A3A6B;--gd:#E8960A;--gd2:#FFF3D0;--gd3:#B8720A;
+  --cr:#FBF8F3;--wh:#fff;
+  --g0:#F7F7F5;--g1:#EFEFEC;--g2:#D9D9D5;--g4:#9E9E98;--g6:#5A5A56;--g8:#2C2C2A;
+  --ok:#1D6F42;--okb:#E6F4EC;--er:#A32D2D;--erb:#FCEBEB;
+}
+body{font-family:-apple-system,Arial,sans-serif;background:var(--cr);color:var(--g8);min-height:100vh}
+h1,h2,h3,h4{font-weight:700;line-height:1.25}
+
+/* AUTH */
+#auth{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#0B1F4E,#1A3A6B);
+  display:flex;align-items:center;justify-content:center;padding:20px}
+.abox{background:#fff;border-radius:20px;width:100%;max-width:400px;overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.alogobar{background:linear-gradient(135deg,#0B1F4E,#1A3A6B);padding:26px 28px 20px;text-align:center}
+.alogobar .bdg{background:#E8960A;color:#0B1F4E;font-weight:800;font-size:13px;
+  padding:5px 10px;border-radius:8px;display:inline-block;margin-bottom:10px}
+.alogobar h2{color:#fff;font-size:20px;font-weight:800;margin-bottom:4px}
+.alogobar p{color:rgba(255,255,255,.6);font-size:12px}
+.atabs{display:flex;border-bottom:1px solid #EFEFEC}
+.atab{flex:1;padding:13px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;
+  color:#9E9E98;border:none;background:none;border-bottom:3px solid transparent}
+.atab.on{color:#0B1F4E;border-bottom-color:#E8960A}
+.abody{padding:22px 26px 26px}
+.afrm{display:none}
+.afrm.on{display:block}
+.afield{margin-bottom:14px}
+.afield label{display:block;font-size:11px;font-weight:700;color:#5A5A56;
+  margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.afield input{width:100%;border:1.5px solid #D9D9D5;border-radius:8px;
+  padding:11px 14px;font-size:14px;color:#2C2C2A;outline:none;background:#fff}
+.afield input:focus{border-color:#0B1F4E;box-shadow:0 0 0 3px rgba(11,31,78,.08)}
+.arow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.aerr{background:#FCEBEB;color:#A32D2D;font-size:12px;padding:9px 12px;border-radius:8px;
+  margin-bottom:12px;display:none;border-left:3px solid #A32D2D}
+.aok{background:#E6F4EC;color:#1D6F42;font-size:12px;padding:9px 12px;border-radius:8px;
+  margin-bottom:12px;display:none;border-left:3px solid #1D6F42}
+.abtn{width:100%;background:#0B1F4E;color:#fff;border:none;border-radius:8px;
+  padding:12px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px}
+.abtn:hover{background:#E8960A;color:#0B1F4E}
+.aswitch{text-align:center;font-size:13px;color:#9E9E98;margin-top:14px}
+.aswitch span{color:#0B1F4E;font-weight:700;cursor:pointer}
+.pwrap{position:relative}
+.pwrap input{padding-right:42px}
+.peye{position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;font-size:14px;color:#9E9E98;padding:2px}
+.sbar{display:flex;gap:4px;margin-top:6px;height:3px}
+.sseg{flex:1;border-radius:3px;background:#EFEFEC}
+.sseg.w{background:#A32D2D}.sseg.f{background:#E8960A}
+.sseg.g{background:#1D9E75}.sseg.s{background:#1D6F42}
+.slbl{font-size:10px;color:#9E9E98;margin-top:3px}
+
+/* HEADER */
+.hdr{background:#0B1F4E;position:sticky;top:0;z-index:900;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+.hdr-in{max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:0 18px;height:58px}
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0}
+.logo-b{background:#E8960A;color:#0B1F4E;font-weight:800;font-size:12px;padding:4px 8px;border-radius:6px}
+.logo-t{color:#fff;font-size:15px;font-weight:700}
+.logo-t span{color:#E8960A}
+.hsrch{flex:1;max-width:420px;position:relative}
+.hsrch input{width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+  border-radius:999px;padding:8px 14px 8px 36px;color:#fff;font-size:13px;outline:none}
+.hsrch input::placeholder{color:rgba(255,255,255,.5)}
+.hsrch input:focus{border-color:#E8960A}
+.hsi{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.5);font-size:13px}
+.hnav{display:flex;align-items:center;gap:4px;margin-left:auto}
+.nb{background:none;border:none;color:rgba(255,255,255,.8);font-size:13px;font-weight:500;
+  padding:7px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.nb:hover{background:rgba(255,255,255,.1);color:#fff}
+.nb.on{background:rgba(232,150,10,.15);color:#E8960A}
+.nbg{background:#E8960A;color:#0B1F4E;font-weight:700;border-radius:8px}
+.nbg:hover{background:#B8720A;color:#fff}
+.ubadge{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:4px 12px 4px 5px;cursor:pointer}
+.ubadge:hover{background:rgba(255,255,255,.18)}
+.uav{width:28px;height:28px;border-radius:50%;background:#E8960A;color:#0B1F4E;
+  font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center}
+.ubadge span{color:#fff;font-size:12px;font-weight:500}
+.umenu{position:absolute;top:54px;right:16px;background:#fff;border-radius:12px;
+  border:1px solid #EFEFEC;box-shadow:0 8px 28px rgba(11,31,78,.15);min-width:170px;
+  z-index:999;overflow:hidden;display:none}
+.umenu.on{display:block}
+.umi{display:block;width:100%;text-align:left;padding:11px 15px;font-size:13px;
+  color:#5A5A56;cursor:pointer;border:none;background:none}
+.umi:hover{background:#F7F7F5;color:#0B1F4E}
+.umi.dng:hover{background:#FCEBEB;color:#A32D2D}
+.usep{height:1px;background:#EFEFEC}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0B1F4E,#1A3A6B);padding:44px 18px 60px;text-align:center}
+.hero-in{max-width:620px;margin:0 auto}
+.htag{display:inline-block;background:rgba(232,150,10,.15);border:1px solid rgba(232,150,10,.3);
+  color:#E8960A;font-size:12px;padding:4px 12px;border-radius:999px;margin-bottom:14px}
+.hero h1{color:#fff;font-size:28px;font-weight:800;letter-spacing:-.5px;margin-bottom:10px}
+.hero h1 span{color:#E8960A}
+.hero p{color:rgba(255,255,255,.7);font-size:15px;margin-bottom:26px}
+.hbar{display:flex;background:#fff;border-radius:999px;overflow:hidden;
+  box-shadow:0 8px 30px rgba(0,0,0,.2);max-width:540px;margin:0 auto}
+.hbar select,.hbar input{border:none;outline:none;font-size:13px;padding:13px 14px;
+  flex:1;background:transparent;color:#2C2C2A}
+.hbar select{border-right:1px solid #EFEFEC;max-width:155px;cursor:pointer}
+.hbar button{background:#E8960A;color:#0B1F4E;border:none;font-weight:700;
+  font-size:13px;padding:13px 20px;cursor:pointer}
+.hbar button:hover{background:#B8720A;color:#fff}
+.hstats{display:flex;justify-content:center;gap:26px;margin-top:22px;flex-wrap:wrap}
+.hstat{color:rgba(255,255,255,.75);font-size:12px}
+.hstat strong{color:#fff;font-size:18px;font-weight:800;display:block}
+
+/* LAYOUT */
+.lay{max-width:1280px;margin:0 auto;padding:26px 18px;
+  display:grid;grid-template-columns:255px 1fr;gap:22px;align-items:start}
+@media(max-width:840px){.lay{grid-template-columns:1fr}.sb{display:none}}
+
+/* SIDEBAR */
+.sb{background:#fff;border-radius:14px;border:1px solid #EFEFEC;padding:16px;position:sticky;top:70px}
+.sbsec{margin-bottom:18px}
+.sbtit{font-size:11px;font-weight:700;color:#9E9E98;text-transform:uppercase;
+  letter-spacing:.8px;margin-bottom:9px}
+.fo{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;
+  cursor:pointer;margin-bottom:2px}
+.fo:hover{background:#F7F7F5}
+.fo input[type=checkbox]{accent-color:#E8960A;width:15px;height:15px;cursor:pointer}
+.fo label{font-size:13px;cursor:pointer;flex:1}
+.fo .cnt{background:#EFEFEC;color:#5A5A56;font-size:10px;font-weight:700;
+  padding:2px 6px;border-radius:999px}
+.pdisp{font-size:14px;font-weight:700;color:#0B1F4E;margin-bottom:6px}
+.pslider{width:100%;accent-color:#E8960A;cursor:pointer}
+.plbls{display:flex;justify-content:space-between;font-size:11px;color:#9E9E98;margin-top:3px}
+.sbbtn{width:100%;background:#0B1F4E;color:#fff;border:none;border-radius:8px;
+  padding:10px;font-size:13px;font-weight:600;cursor:pointer;margin-top:6px}
+.sbclr{width:100%;background:none;color:#9E9E98;border:1px solid #D9D9D5;border-radius:8px;
+  padding:9px;font-size:12px;cursor:pointer;margin-top:5px}
+.sbclr:hover{border-color:#A32D2D;color:#A32D2D}
+
+/* LISTINGS */
+.tbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.lcnt{font-size:14px;font-weight:600}
+.lcnt span{color:#E8960A}
+.sortbar{display:flex;align-items:center;gap:8px;font-size:12px;color:#9E9E98}
+.sortbar select{border:1px solid #D9D9D5;border-radius:8px;padding:5px 9px;
+  font-size:12px;background:#fff;cursor:pointer;outline:none}
+.vtog{display:flex;gap:3px}
+.vtog button{background:none;border:1px solid #D9D9D5;border-radius:8px;
+  padding:5px 9px;cursor:pointer;color:#9E9E98;font-size:13px}
+.vtog button.on{background:#0B1F4E;border-color:#0B1F4E;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:16px}
+.grid.lv{grid-template-columns:1fr}
+
+/* CARD */
+.card{background:#fff;border-radius:14px;overflow:hidden;border:1px solid #EFEFEC;
+  cursor:pointer;display:flex;flex-direction:column}
+.card:hover{box-shadow:0 8px 24px rgba(11,31,78,.12)}
+.cimg{position:relative;overflow:hidden;height:175px}
+.cimg img{width:100%;height:100%;object-fit:cover;display:block}
+.cbadge{position:absolute;top:8px;left:8px;font-size:10px;font-weight:700;
+  padding:3px 8px;border-radius:999px;text-transform:uppercase}
+.av{background:#E6F4EC;color:#1D6F42}
+.lm{background:#FFF3D0;color:#B8720A}
+.fu{background:#FCEBEB;color:#A32D2D}
+.cfav{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.9);
+  border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:14px}
+.cbdy{padding:13px;flex:1;display:flex;flex-direction:column}
+.chst{font-size:10px;font-weight:700;color:#B8720A;text-transform:uppercase;
+  letter-spacing:.5px;margin-bottom:3px}
+.ctit{font-size:14px;font-weight:700;color:#0B1F4E;margin-bottom:6px;line-height:1.3}
+.cloc{font-size:11px;color:#9E9E98;margin-bottom:8px}
+.cfeats{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px}
+.fpill{background:#F7F7F5;border:1px solid #EFEFEC;color:#5A5A56;
+  font-size:10px;padding:2px 8px;border-radius:999px}
+.cfoot{display:flex;align-items:flex-end;justify-content:space-between;
+  margin-top:auto;padding-top:10px;border-top:1px solid #EFEFEC}
+.camt{font-size:18px;font-weight:800;color:#0B1F4E;line-height:1}
+.cper{font-size:10px;color:#9E9E98;margin-top:2px}
+.crat{display:flex;align-items:center;gap:3px;font-size:11px;color:#5A5A56}
+.csta{color:#E8960A;font-size:12px}
+.ccta{background:#0B1F4E;color:#fff;border:none;border-radius:8px;
+  font-size:11px;font-weight:700;padding:7px 12px;cursor:pointer}
+.ccta:hover{background:#E8960A;color:#0B1F4E}
+.nores{text-align:center;padding:48px 18px;color:#9E9E98;grid-column:1/-1}
+
+/* OVERLAYS */
+.ov{position:fixed;inset:0;background:rgba(11,31,78,.55);z-index:1000;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:18px;overflow-y:auto;opacity:0;pointer-events:none}
+.ov.on{opacity:1;pointer-events:all}
+.modal{background:#fff;border-radius:18px;max-width:860px;width:100%;
+  transform:translateY(14px);position:relative;margin:auto}
+.ov.on .modal{transform:translateY(0)}
+.mclose{position:absolute;top:11px;right:11px;z-index:10;background:rgba(255,255,255,.9);
+  border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer}
+
+/* DETAIL */
+.dgal{position:relative;height:290px;overflow:hidden}
+.dgal img{width:100%;height:100%;object-fit:cover;display:block}
+.garr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.85);
+  border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:16px}
+.garr.pv{left:10px}.garr.nx{right:10px}
+.dthumbs{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px}
+.dthumb{width:40px;height:30px;border-radius:5px;overflow:hidden;cursor:pointer;
+  border:2px solid rgba(255,255,255,.4);flex-shrink:0}
+.dthumb.on{border-color:#E8960A}
+.dthumb img{width:100%;height:100%;object-fit:cover}
+.dbody{padding:20px 24px}
+.dtop{display:flex;align-items:flex-start;justify-content:space-between;
+  gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.dhst{font-size:11px;font-weight:700;color:#B8720A;text-transform:uppercase;
+  letter-spacing:.5px;margin-bottom:4px}
+.dtit{font-size:21px;font-weight:800;color:#0B1F4E;margin-bottom:6px;line-height:1.2}
+.dloc{font-size:12px;color:#9E9E98}
+.dpbox{text-align:right}
+.dpri{font-size:26px;font-weight:800;color:#0B1F4E;line-height:1}
+.dpper{font-size:11px;color:#9E9E98;margin-top:2px}
+.davail{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;
+  border-radius:999px;margin-top:6px}
+.dsec{font-size:13px;font-weight:700;color:#2C2C2A;margin-bottom:9px;
+  padding-bottom:7px;border-bottom:1px solid #EFEFEC}
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:6px;margin-bottom:18px}
+.aitem{display:flex;align-items:center;gap:6px;padding:6px 10px;
+  background:#F7F7F5;border-radius:8px;font-size:12px;color:#5A5A56}
+.ddesc{font-size:13px;color:#5A5A56;line-height:1.7;margin-bottom:18px}
+.dmap{background:#F7F7F5;border:1px solid #EFEFEC;border-radius:10px;
+  height:130px;display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:#9E9E98;margin-bottom:18px}
+.dftr{display:flex;gap:10px;justify-content:flex-end;
+  padding-top:14px;border-top:1px solid #EFEFEC}
+.bout{background:none;border:1px solid #D9D9D5;color:#5A5A56;font-size:13px;
+  font-weight:600;padding:10px 16px;border-radius:8px;cursor:pointer}
+.bout:hover{border-color:#0B1F4E;color:#0B1F4E}
+.bpri{background:#0B1F4E;color:#fff;border:none;font-size:13px;font-weight:700;
+  padding:10px 22px;border-radius:8px;cursor:pointer}
+.bpri:hover{background:#E8960A;color:#0B1F4E}
+.bpri:disabled{background:#D9D9D5;color:#9E9E98;cursor:not-allowed}
+
+/* APPLY */
+.amod{max-width:540px}
+.amhdr{background:#0B1F4E;padding:20px 24px;color:#fff;border-radius:18px 18px 0 0}
+.amhdr h2{font-size:17px;margin-bottom:3px}
+.amhdr p{font-size:12px;opacity:.7}
+.amprv{display:flex;gap:10px;align-items:center;padding:11px 24px;
+  background:#FFF3D0;border-bottom:1px solid rgba(232,150,10,.2)}
+.amprv img{width:48px;height:36px;border-radius:6px;object-fit:cover}
+.amprv .at{font-size:12px;font-weight:700;color:#0B1F4E}
+.amprv .ap{font-size:11px;color:#B8720A;font-weight:600}
+.amform{padding:16px 24px 20px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}
+.fg{margin-bottom:11px}
+.fg label{display:block;font-size:12px;font-weight:600;color:#5A5A56;margin-bottom:5px}
+.fg input,.fg select,.fg textarea{width:100%;border:1px solid #D9D9D5;border-radius:8px;
+  padding:9px 12px;font-size:13px;color:#2C2C2A;outline:none;background:#fff}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#0B1F4E}
+.fg textarea{resize:vertical;min-height:65px}
+.fchk{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#5A5A56;margin-bottom:14px}
+.fchk input{accent-color:#E8960A;margin-top:2px}
+.asbrow{display:flex;gap:10px;justify-content:flex-end}
+.succ{padding:32px 24px;text-align:center;display:none}
+.succ-ico{width:60px;height:60px;background:#E6F4EC;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 12px}
+.succ h3{font-size:17px;font-weight:800;color:#0B1F4E;margin-bottom:6px}
+.succ p{font-size:13px;color:#5A5A56;line-height:1.6}
+.sref{display:inline-block;background:#FFF3D0;color:#B8720A;font-weight:800;
+  font-size:14px;padding:7px 16px;border-radius:8px;margin:12px 0;letter-spacing:1px}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;
+  vertical-align:middle;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ADMIN */
+#adv{display:none}
+.awrap{max-width:1280px;margin:0 auto;padding:26px 18px}
+.abhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.abhdr h2{font-size:19px;color:#0B1F4E}
+.astats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:13px;margin-bottom:22px}
+.asc{background:#fff;border:1px solid #EFEFEC;border-radius:14px;padding:14px 16px}
+.asc .lbl{font-size:11px;color:#9E9E98;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.asc .val{font-size:24px;font-weight:800;color:#0B1F4E}
+.atwrap{background:#fff;border:1px solid #EFEFEC;border-radius:14px;overflow:hidden}
+.athdr{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #EFEFEC}
+.athdr h3{font-size:14px;font-weight:700;color:#0B1F4E}
+table{width:100%;border-collapse:collapse}
+th{background:#F7F7F5;text-align:left;padding:9px 13px;font-size:10px;font-weight:700;
+  color:#9E9E98;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #EFEFEC}
+td{padding:10px 13px;font-size:12px;color:#5A5A56;border-bottom:1px solid #EFEFEC}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#F7F7F5}
+.tdimg{width:38px;height:28px;border-radius:4px;object-fit:cover}
+.tdtit{font-weight:700;color:#2C2C2A}
+.tdpri{font-weight:700;color:#0B1F4E}
+.sbdg{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px}
+.sav{background:#E6F4EC;color:#1D6F42}.slm{background:#FFF3D0;color:#B8720A}
+.sfu{background:#FCEBEB;color:#A32D2D}
+.tdact{display:flex;gap:5px}
+.abtn{background:none;border:1px solid #D9D9D5;border-radius:6px;
+  padding:4px 9px;font-size:11px;cursor:pointer;font-weight:500}
+.abtn.ed{color:#0B1F4E}.abtn.ed:hover{background:#0B1F4E;color:#fff;border-color:#0B1F4E}
+.abtn.dl{color:#A32D2D}.abtn.dl:hover{background:#A32D2D;color:#fff;border-color:#A32D2D}
+.abtn.ap{color:#1D6F42}.abtn.ap:hover{background:#1D6F42;color:#fff;border-color:#1D6F42}
+.appwrap{background:#fff;border:1px solid #EFEFEC;border-radius:14px;overflow:hidden;margin-top:22px}
+.appitem{display:flex;gap:11px;padding:11px 16px;border-bottom:1px solid #EFEFEC;align-items:center;flex-wrap:wrap}
+.appitem:last-child{border-bottom:none}
+.appav{width:36px;height:36px;border-radius:50%;background:#0B1F4E;color:#fff;
+  font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.appinf{flex:1}
+.appinf .nm{font-weight:600;font-size:13px;color:#2C2C2A}
+.appinf .mt{font-size:11px;color:#9E9E98;margin-top:2px}
+
+/* EDIT */
+.emod{max-width:600px}
+.emhdr{background:#0B1F4E;padding:17px 22px;color:#fff;border-radius:18px 18px 0 0}
+.emhdr h3{font-size:15px;font-weight:700}
+.embdy{padding:18px 22px 22px;max-height:70vh;overflow-y:auto}
+
+/* ADMIN LOGIN */
+.alogin{min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:#0B1F4E;padding:18px}
+.alcard{background:#fff;border-radius:18px;padding:32px;max-width:340px;width:100%;text-align:center}
+.allerr{background:#FCEBEB;color:#A32D2D;font-size:12px;padding:7px 11px;
+  border-radius:8px;margin-bottom:10px;display:none}
+.alback{margin-top:13px;font-size:12px;color:#9E9E98;cursor:pointer}
+.alback:hover{color:#0B1F4E}
+
+/* FOOTER */
+footer{background:#0B1F4E;color:rgba(255,255,255,.7);padding:32px 18px 18px;margin-top:36px}
+.ftin{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:26px;margin-bottom:26px}
+.ftcol h4{color:#fff;font-size:13px;margin-bottom:11px}
+.ftcol p,.ftcol a{font-size:12px;line-height:1.8;color:rgba(255,255,255,.6);text-decoration:none}
+.ftcol ul{list-style:none}
+.ftcol a:hover{color:#E8960A}
+.ftbot{border-top:1px solid rgba(255,255,255,.1);padding-top:14px;display:flex;
+  justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:11px;opacity:.5;
+  max-width:1280px;margin:0 auto}
+
+@media(max-width:580px){.frow{grid-template-columns:1fr}.dgal{height:200px}.dthumbs{display:none}}
+
+/* PROFILE + MY APPS MODAL */
+.pmod{max-width:500px}
+.pmhdr{background:#0B1F4E;padding:20px 24px;color:#fff;border-radius:18px 18px 0 0;display:flex;align-items:center;gap:14px}
+.pmav{width:52px;height:52px;border-radius:50%;background:#E8960A;color:#0B1F4E;font-weight:800;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pmhdr h2{font-size:17px;font-weight:800;margin-bottom:2px}
+.pmhdr p{font-size:12px;opacity:.7}
+.pmbody{padding:20px 24px 24px}
+.pmsec{font-size:11px;font-weight:700;color:#9E9E98;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid #EFEFEC}
+.pmrow{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F7F7F5}
+.pmrow:last-child{border-bottom:none}
+.pmrow .lbl{font-size:12px;color:#9E9E98;font-weight:500}
+.pmrow .val{font-size:13px;color:#2C2C2A;font-weight:600;text-align:right;max-width:60%}
+.pmrow .val a{color:#0B1F4E;text-decoration:none}
+.apcard{background:#F7F7F5;border-radius:10px;padding:13px 14px;margin-bottom:10px;border-left:3px solid #E8960A}
+.apcard:last-child{margin-bottom:0}
+.apcard .art{font-size:13px;font-weight:700;color:#0B1F4E;margin-bottom:4px}
+.apcard .adet{font-size:11px;color:#5A5A56;line-height:1.7}
+.apcard .aref{display:inline-block;background:#FFF3D0;color:#B8720A;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;margin-top:5px;letter-spacing:.5px}
+.apcard .ast{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;margin-top:5px;margin-left:4px}
+.ast-pending{background:#F0F4FF;color:#1A3A6B}
+.ast-approved{background:#E6F4EC;color:#1D6F42}
+.ast-rejected{background:#FCEBEB;color:#A32D2D}
+.emptystate{text-align:center;padding:28px 16px;color:#9E9E98}
+.emptystate p{font-size:13px;margin-top:6px}
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth" style="display:flex">
+  <div class="abox">
+    <div class="alogobar">
+      <div class="bdg">UCC</div>
+      <h2>HostelFinder</h2>
+      <p>University of Cape Coast </p>
+    </div>
+    <div class="atabs">
+      <button class="atab on" id="tli" onclick="stab('li')">Sign In</button>
+      <button class="atab" id="tsu" onclick="stab('su')">Create Account</button>
+    </div>
+    <div class="abody">
+      <div class="afrm on" id="fli">
+        <div class="aerr" id="lierr"></div>
+        <div class="afield">
+          <label>Email Address</label>
+          <input type="email" id="liemail" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doLi()">
+        </div>
+        <div class="afield">
+          <label>Password</label>
+          <div class="pwrap">
+            <input type="password" id="lipass" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLi()">
+            <button class="peye" onclick="tpwd('lipass',this)" type="button">show</button>
+          </div>
+        </div>
+        <div style="text-align:right;margin-top:-8px;margin-bottom:12px;font-size:12px;color:#9E9E98;cursor:pointer" onclick="doForgot()">Forgot password?</div>
+        <button class="abtn" onclick="doLi()">Sign In to HostelFinder</button>
+        <div class="aswitch">No account? <span onclick="stab('su')">Create one free</span></div>
+      </div>
+      <div class="afrm" id="fsu">
+        <div class="aerr" id="suerr"></div>
+        <div class="aok" id="suok"></div>
+        <div class="arow">
+          <div class="afield"><label>First Name</label><input type="text" id="sufn" placeholder="Ama"></div>
+          <div class="afield"><label>Last Name</label><input type="text" id="suln" placeholder="Mensah"></div>
+        </div>
+        <div class="afield"><label>Student ID</label><input type="text" id="susid" placeholder="UCC/2024/001"></div>
+        <div class="afield"><label>Email Address</label><input type="email" id="suemail" placeholder="your@email.com"></div>
+        <div class="afield"><label>Programme</label><input type="text" id="suprog" placeholder="BSc. Computer Science"></div>
+        <div class="afield">
+          <label>Password</label>
+          <div class="pwrap">
+            <input type="password" id="supass" placeholder="Create a password" oninput="chkStr(this.value)">
+            <button class="peye" onclick="tpwd('supass',this)" type="button">show</button>
+          </div>
+          <div class="sbar"><div class="sseg" id="sb1"></div><div class="sseg" id="sb2"></div><div class="sseg" id="sb3"></div><div class="sseg" id="sb4"></div></div>
+          <div class="slbl" id="slbl">Enter a password</div>
+        </div>
+        <div class="afield">
+          <label>Confirm Password</label>
+          <div class="pwrap">
+            <input type="password" id="supass2" placeholder="Repeat your password">
+            <button class="peye" onclick="tpwd('supass2',this)" type="button">show</button>
+          </div>
+        </div>
+        <button class="abtn" onclick="doSu()">Create My Account</button>
+        <div class="aswitch">Have an account? <span onclick="stab('li')">Sign in</span></div>
+        <div style="font-size:11px;color:#9E9E98;text-align:center;margin-top:12px">By signing up you agree to our Terms and Privacy Policy.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="hdr" style="display:none" id="hdr">
+  <div class="hdr-in">
+    <a class="logo" href="#" onclick="goMain();return false">
+      <span class="logo-b">UCC</span>
+      <span class="logo-t">Hostel<span>Finder</span></span>
+    </a>
+    <div class="hsrch">
+      <span class="hsi">&#128269;</span>
+      <input type="text" id="hq" placeholder="Search hostels or locations..." oninput="runF()">
+    </div>
+    <nav class="hnav" id="hnav">
+      <button class="nb on" id="nbL" onclick="goMain()">Listings</button>
+      <button class="nb" id="nbA" onclick="goAdmin()">Admin Panel</button>
+    </nav>
+  </div>
+</header>
+
+<!-- MAIN VIEW -->
+<div id="mainv" style="display:none">
+  <section class="hero">
+    <div class="hero-in">
+      <div class="htag">University of Cape Coast - 2024/2025 Academic Year</div>
+      <h1>Find Your Perfect<br><span>Student Hostel</span></h1>
+      <p>Browse verified rooms, compare prices, and apply online.</p>
+      <div class="hbar">
+        <select id="htype" onchange="runF()">
+          <option value="">All Room Types</option>
+          <option value="Single">Single Room</option>
+          <option value="Double">Double Room</option>
+          <option value="Triple">Triple Room</option>
+          <option value="Quad">Quad Room</option>
+        </select>
+        <input type="text" id="hq2" placeholder="Search hostel or location..." oninput="runF()">
+        <button onclick="runF()">Search</button>
+      </div>
+      <div class="hstats">
+        <div class="hstat"><strong id="stT">12</strong>Rooms</div>
+        <div class="hstat"><strong id="stA">9</strong>Available</div>
+        <div class="hstat"><strong>5</strong>Hostels</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="lay">
+    <aside class="sb">
+      <div class="sbsec">
+        <div class="sbtit">Room Type</div>
+        <div class="fo"><input type="checkbox" id="fS" onchange="runF()"><label for="fS">Single Room</label><span class="cnt" id="cS">3</span></div>
+        <div class="fo"><input type="checkbox" id="fD" onchange="runF()"><label for="fD">Double Room</label><span class="cnt" id="cD">4</span></div>
+        <div class="fo"><input type="checkbox" id="fT" onchange="runF()"><label for="fT">Triple Room</label><span class="cnt" id="cT">3</span></div>
+        <div class="fo"><input type="checkbox" id="fQ" onchange="runF()"><label for="fQ">Quad Room</label><span class="cnt" id="cQ">2</span></div>
+      </div>
+      <div class="sbsec">
+        <div class="sbtit">Max Price (GHS/yr)</div>
+        <div class="pdisp" id="pdisp">Up to GHS 5,000</div>
+        <input type="range" class="pslider" id="psl" min="500" max="5000" step="100" value="5000" oninput="updP(this.value)">
+        <div class="plbls"><span>GHS 500</span><span>GHS 5,000</span></div>
+      </div>
+      <div class="sbsec">
+        <div class="sbtit">Availability</div>
+        <div class="fo"><input type="checkbox" id="fAv" onchange="runF()"><label for="fAv">Available</label></div>
+        <div class="fo"><input type="checkbox" id="fLm" onchange="runF()"><label for="fLm">Limited Slots</label></div>
+      </div>
+      <div class="sbsec">
+        <div class="sbtit">Amenities</div>
+        <div class="fo"><input type="checkbox" id="aWf" onchange="runF()"><label for="aWf">Wi-Fi</label></div>
+        <div class="fo"><input type="checkbox" id="aAC" onchange="runF()"><label for="aAC">Air Conditioning</label></div>
+        <div class="fo"><input type="checkbox" id="aWt" onchange="runF()"><label for="aWt">Constant Water</label></div>
+        <div class="fo"><input type="checkbox" id="aPk" onchange="runF()"><label for="aPk">Parking</label></div>
+      </div>
+      <button class="sbbtn" onclick="runF()">Apply Filters</button>
+      <button class="sbclr" onclick="clrF()">Clear All</button>
+    </aside>
+    <div>
+      <div class="tbar">
+        <div class="lcnt">Showing <span id="cnt">0</span> rooms</div>
+        <div class="sortbar">
+          Sort:
+          <select id="srt" onchange="runF()">
+            <option value="">Default</option>
+            <option value="pa">Price: Low to High</option>
+            <option value="pd">Price: High to Low</option>
+            <option value="ra">Best Rated</option>
+          </select>
+          <div class="vtog">
+            <button id="vg" class="on" onclick="setV('g')">Grid</button>
+            <button id="vl" onclick="setV('l')">List</button>
+          </div>
+        </div>
+      </div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="ftin">
+      <div class="ftcol"><h4>UCC HostelFinder</h4><p>Official hostel listing platform for University of Cape Coast students.</p></div>
+      <div class="ftcol"><h4>Quick Links</h4><ul><li><a href="#">Browse Rooms</a></li><li><a href="#">How It Works</a></li><li><a href="#">FAQs</a></li></ul></div>
+      <div class="ftcol"><h4>Hostels</h4><ul><li><a href="#">Atlantic View</a></li><li><a href="#">Palm Court</a></li><li><a href="#">Scholar Inn</a></li><li><a href="#">New Unity Hall</a></li><li><a href="#">Green Valley</a></li></ul></div>
+      <div class="ftcol"><h4>Contact</h4><p>University of Cape Coast<br>Cape Coast, Ghana<br><br>Email: brightabredu50@gmail.com<br>Tel: +233 553485174</p></div>
+    </div>
+    <div class="ftbot"><span>2024 UCC HostelFinder. All rights reserved.</span><span>Built for UCC Students</span></div>
+  </footer>
+</div>
+
+<!-- ADMIN VIEW -->
+<div id="adv">
+  <div id="alscr" class="alogin">
+    <div class="alcard">
+      <div style="background:#E8960A;color:#0B1F4E;font-weight:800;font-size:13px;padding:5px 10px;border-radius:8px;display:inline-block;margin-bottom:10px">UCC</div>
+      <h2 style="color:#0B1F4E;font-size:19px;margin-bottom:5px">Admin Login</h2>
+      <p style="font-size:13px;color:#9E9E98;margin-bottom:18px">Manage hostel listings</p>
+      <div class="allerr" id="alerr">Wrong password. Try again.</div>
+      <div class="fg" style="text-align:left">
+        <label>Admin Password</label>
+        <input type="password" id="alpass" placeholder="Enter password" onkeydown="if(event.key==='Enter')doAl()">
+      </div>
+      <button class="bpri" style="width:100%;margin-top:6px" onclick="doAl()">Sign In</button>
+      <p class="alback" onclick="goMain()">Back to Listings</p>
+    </div>
+  </div>
+  <div id="apnl" style="display:none">
+    <header class="hdr">
+      <div class="hdr-in">
+        <a class="logo" href="#" onclick="goMain();return false"><span class="logo-b">UCC</span><span class="logo-t">Hostel<span>Finder</span> Admin</span></a>
+        <nav class="hnav">
+          <button class="nb" onclick="goMain()">View Site</button>
+          <button class="nbg nb" onclick="openAdd()">+ Add Room</button>
+          <button class="nb" onclick="doAlOut()">Logout</button>
+        </nav>
+      </div>
+    </header>
+    <div class="awrap">
+      <div class="abhdr"><h2>Dashboard</h2><span style="font-size:12px;color:#9E9E98">2024/2025 Academic Year</span></div>
+      <div class="astats" id="astats"></div>
+      <div class="atwrap">
+        <div class="athdr"><h3>All Listings</h3><button class="nbg nb" style="font-size:12px;padding:6px 12px" onclick="openAdd()">+ Add Room</button></div>
+        <div style="overflow-x:auto"><table><thead><tr><th>Photo</th><th>Room</th><th>Type</th><th>Price</th><th>Status</th><th>Slots</th><th>Actions</th></tr></thead><tbody id="atbody"></tbody></table></div>
+      </div>
+      <div class="appwrap">
+        <div class="athdr"><h3>Applications</h3><span style="font-size:11px;color:#9E9E98" id="appcnt">0</span></div>
+        <div id="applist"><div style="padding:24px;text-align:center;color:#9E9E98;font-size:13px">No applications yet.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL OVERLAY -->
+<div class="ov" id="detOv">
+  <div class="modal">
+    <button class="mclose" onclick="cOv('detOv')">X</button>
+    <div class="dgal"><img id="gMain" src="" alt=""><button class="garr pv" onclick="gN(-1)">&lt;</button><button class="garr nx" onclick="gN(1)">&gt;</button><div class="dthumbs" id="gTh"></div></div>
+    <div class="dbody">
+      <div class="dtop">
+        <div><div class="dhst" id="dH"></div><div class="dtit" id="dT"></div><div class="dloc" id="dL"></div></div>
+        <div class="dpbox"><div class="dpri" id="dP"></div><div class="dpper">per academic year</div><div class="davail" id="dA"></div></div>
+      </div>
+      <div class="dsec">Amenities</div>
+      <div class="agrid" id="dAm"></div>
+      <div class="dsec">Description</div>
+      <p class="ddesc" id="dDs"></p>
+      <div class="dsec">Location</div>
+      <div class="dmap">University of Cape Coast, Cape Coast, Ghana</div>
+      <div class="dftr">
+        <button class="bout" onclick="cOv('detOv')">Close</button>
+        <button class="bpri" id="appBtn" onclick="openApp()">Apply for This Room</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APPLY OVERLAY -->
+<div class="ov" id="appOv">
+  <div class="modal amod">
+    <button class="mclose" onclick="cOv('appOv')">X</button>
+    <div id="afWrap">
+      <div class="amhdr"><h2>Apply for Room</h2><p>Fill in your details. An email will be sent.</p></div>
+      <div class="amprv"><img id="apImg" src="" alt=""><div><div class="at" id="apTit"></div><div class="ap" id="apPri"></div></div></div>
+      <form class="amform" id="appForm" onsubmit="subApp(event)">
+        <div class="frow">
+          <div class="fg"><label>First Name *</label><input name="first_name" required placeholder="Ama"></div>
+          <div class="fg"><label>Last Name *</label><input name="last_name" required placeholder="Mensah"></div>
+        </div>
+        <div class="frow">
+          <div class="fg"><label>Student ID *</label><input name="student_id" required placeholder="UCC/2024/001"></div>
+          <div class="fg"><label>Programme *</label><input name="programme" required placeholder="BSc. Computer Science"></div>
+        </div>
+        <div class="frow">
+          <div class="fg"><label>Email *</label><input type="email" name="email" required placeholder="your@email.com"></div>
+          <div class="fg"><label>Phone *</label><input name="phone" required placeholder="+233 XX XXX XXXX"></div>
+        </div>
+        <div class="frow">
+          <div class="fg"><label>Year of Study *</label><select name="year" required><option value="">Select</option><option>Year 1</option><option>Year 2</option><option>Year 3</option><option>Year 4</option><option>Postgraduate</option></select></div>
+          <div class="fg"><label>Academic Year *</label><select name="acyr" required><option value="">Select</option><option>2024/2025</option><option>2025/2026</option></select></div>
+        </div>
+        <div class="fg"><label>Comments</label><textarea name="comments" placeholder="Any special requirements..."></textarea></div>
+        <div class="fchk"><input type="checkbox" id="tc" required><label for="tc">I confirm this information is accurate and agree to the hostel terms and conditions.</label></div>
+        <div class="asbrow">
+          <button type="button" class="bout" onclick="cOv('appOv')">Cancel</button>
+          <button type="submit" class="bpri" id="subBtn">Submit Application</button>
+        </div>
+      </form>
+    </div>
+    <div class="succ" id="succP">
+      <div class="succ-ico">OK</div>
+      <h3>Application Submitted!</h3>
+      <p>Your application has been received. An email has been sent to the hostel manager.</p>
+      <div class="sref" id="sref">REF-000000</div>
+      <p style="font-size:12px;color:#9E9E98">Keep this reference number for follow-up.</p>
+      <button class="bpri" style="margin-top:16px" onclick="cOv('appOv')">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT OVERLAY -->
+<div class="ov" id="editOv">
+  <div class="modal emod">
+    <div class="emhdr"><h3 id="emTit">Add New Room</h3></div>
+    <button class="mclose" style="top:10px;right:10px;background:rgba(255,255,255,.15);color:#fff" onclick="cOv('editOv')">X</button>
+    <div class="embdy">
+      <div class="frow"><div class="fg"><label>Room Title *</label><input id="eT" placeholder="e.g. Ensuite Single Room"></div><div class="fg"><label>Hostel Name *</label><input id="eH" placeholder="e.g. Atlantic View Hostel"></div></div>
+      <div class="frow"><div class="fg"><label>Room Type</label><select id="eTy"><option>Single</option><option>Double</option><option>Triple</option><option>Quad</option></select></div><div class="fg"><label>Price (GHS/yr) *</label><input type="number" id="eP" placeholder="2500"></div></div>
+      <div class="frow"><div class="fg"><label>Status</label><select id="eSt"><option value="available">Available</option><option value="limited">Limited</option><option value="full">Full</option></select></div><div class="fg"><label>Slots</label><input type="number" id="eSl" placeholder="5"></div></div>
+      <div class="fg"><label>Location</label><input id="eLo" placeholder="e.g. 5 mins from main campus"></div>
+      <div class="fg"><label>Description</label><textarea id="eDe" style="min-height:70px" placeholder="Describe the room..."></textarea></div>
+      <div class="fg"><label>Amenities (comma separated)</label><input id="eAm" placeholder="Wi-Fi, AC, Water, Security"></div>
+      <div class="fg"><label>Image URLs (comma separated, up to 4)</label><textarea id="eIm" style="min-height:50px" placeholder="https://images.unsplash.com/..."></textarea></div>
+      <div class="fg"><label>Rating (1-5)</label><input type="number" id="eRa" min="1" max="5" step="0.1" placeholder="4.5"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px">
+        <button class="bout" onclick="cOv('editOv')">Cancel</button>
+        <button class="bpri" onclick="saveR()">Save Room</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- USER MENU -->
+<div class="umenu" id="umenu">
+  <button class="umi" onclick="openProfile()">My Profile</button>
+  <button class="umi" onclick="openMyApps()">My Applications</button>
+  <div class="usep"></div>
+  <button class="umi dng" onclick="doUOut()">Sign Out</button>
+</div>
+
+<script>
+var APASS = 'Admin1234';
+var REMAIL = 'brightabredu50@gmail.com';
+
+var ICONS = {
+  'Wi-Fi':'[WiFi]','High-Speed Wi-Fi':'[WiFi]','Air Conditioning':'[AC]','Fan':'[Fan]',
+  'Ensuite Bathroom':'[Bath]','Private Bathroom':'[Bath]','Shared Bathroom':'[Bath]',
+  'Common Bathroom':'[Bath]','Ensuite Hot Shower':'[Bath]',
+  'Study Desk':'[Desk]','Study Desk x2':'[Desk]','Study Area':'[Desk]','Study Lounge':'[Desk]',
+  'Wardrobe':'[Ward]','Wardrobe x2':'[Ward]','Locker':'[Lock]',
+  'Security':'[Sec]','Security Guard':'[Sec]','CCTV':'[CCTV]',
+  'Generator Backup':'[Gen]','Constant Water':'[H2O]','Water':'[H2O]',
+  'Parking':'[Park]','Mini Fridge':'[Fridge]','TV':'[TV]',
+  'Cafeteria Access':'[Cafe]','Balcony':'[Balc]','Garden Area':'[Gard]'
+};
+
+var DEF = [
+  {id:1,title:'Ensuite Single Room',hostel:'Atlantic View Hostel',type:'Single',price:3200,status:'available',slots:6,location:'3 mins walk from Main Campus Gate',rating:4.8,
+   desc:'A spacious ensuite single room offering maximum privacy. Located in Atlantic View Hostel. Fully furnished with study desk, wardrobe, and comfortable bed. Constant electricity and water supply guaranteed.',
+   amenities:['Wi-Fi','Air Conditioning','Ensuite Bathroom','Study Desk','Wardrobe','Security','Constant Water','Generator Backup'],
+   images:['https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=700&q=70','https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=700&q=70','https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=700&q=70','https://images.unsplash.com/photo-1560185127-6b26564dfe6c?w=700&q=70']},
+  {id:2,title:'Standard Double Room',hostel:'Atlantic View Hostel',type:'Double',price:2200,status:'available',slots:10,location:'3 mins walk from Main Campus Gate',rating:4.5,
+   desc:'Comfortable double room shared between two students. Each occupant gets their own study area and storage. Modern furnishings and good ventilation.',
+   amenities:['Wi-Fi','Fan','Shared Bathroom','Study Desk x2','Wardrobe x2','Security','Constant Water'],
+   images:['https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=700&q=70','https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=700&q=70','https://images.unsplash.com/photo-1519642918688-7e43b19245d8?w=700&q=70','https://images.unsplash.com/photo-1598928636135-d146006ff4be?w=700&q=70']},
+  {id:3,title:'Premium Single Suite',hostel:'Palm Court Hostel',type:'Single',price:3800,status:'limited',slots:2,location:'2 mins walk from Science Faculty',rating:4.9,
+   desc:'The most luxurious single room at UCC. Private ensuite with hot water, large study area, high-speed internet. Palm Court is renowned for its serene environment and top-tier security.',
+   amenities:['High-Speed Wi-Fi','Air Conditioning','Ensuite Hot Shower','Study Lounge','Mini Fridge','Security Guard','CCTV','Generator Backup','Parking'],
+   images:['https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=700&q=70','https://images.unsplash.com/photo-1560185127-6b26564dfe6c?w=700&q=70','https://images.unsplash.com/photo-1608198093002-ad4e005484ec?w=700&q=70','https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=700&q=70']},
+  {id:4,title:'Triple Sharing Room',hostel:"Scholar's Inn",type:'Triple',price:1500,status:'available',slots:15,location:'5 mins walk from Central Library',rating:4.2,
+   desc:'Affordable triple sharing room for budget students. Three occupants with individual study spaces. Near the Central Library, ideal for academic focus.',
+   amenities:['Wi-Fi','Fan','Common Bathroom','Study Desk','Locker','Security','Water'],
+   images:['https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=700&q=70','https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=700&q=70','https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=700&q=70','https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=700&q=70']},
+  {id:5,title:'Economy Double Room',hostel:"Scholar's Inn",type:'Double',price:1800,status:'available',slots:8,location:'5 mins walk from Central Library',rating:4.0,
+   desc:'Well-kept double room at an affordable price. Both occupants get dedicated study desks and lockers. Quiet, academically-oriented environment.',
+   amenities:['Wi-Fi','Fan','Shared Bathroom','Study Desk','Locker','Security'],
+   images:['https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=700&q=70','https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=700&q=70','https://images.unsplash.com/photo-1513694203232-719a280e022f?w=700&q=70','https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=700&q=70']},
+  {id:6,title:'Modern Single Room',hostel:'New Unity Hall',type:'Single',price:2800,status:'available',slots:4,location:'Within Main Campus - 1 min from lecture halls',rating:4.7,
+   desc:'Modern single occupancy room right within the main campus. Steps away from lecture halls, cafeteria, and sports facilities. Contemporary furnishings and reliable utilities.',
+   amenities:['Wi-Fi','Air Conditioning','Ensuite Bathroom','Study Desk','Wardrobe','Security','Constant Water','Cafeteria Access'],
+   images:['https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=700&q=70','https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=700&q=70','https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&q=70','https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=700&q=70']},
+  {id:7,title:'Quad Room - Budget Pick',hostel:'New Unity Hall',type:'Quad',price:1200,status:'available',slots:20,location:'Within Main Campus - 1 min from lecture halls',rating:3.9,
+   desc:'Most affordable option at UCC. Four students share a spacious room with individual study spaces. Perfect for first-years keeping costs low. Great campus access.',
+   amenities:['Wi-Fi','Fan','Common Bathroom','Study Area','Locker','Security'],
+   images:['https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=700&q=70','https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=700&q=70','https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=700&q=70','https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=700&q=70']},
+  {id:8,title:'Deluxe Double Room',hostel:'Green Valley Hostel',type:'Double',price:2600,status:'limited',slots:3,location:'7 mins walk from UCC main gate, quiet area',rating:4.6,
+   desc:'Beautifully furnished double room in peaceful Green Valley Hostel. Away from campus noise. Both occupants enjoy generous space, natural light, and premium furniture.',
+   amenities:['Wi-Fi','Air Conditioning','Ensuite Bathroom','Study Desk x2','Wardrobe x2','Security','Constant Water','Garden Area'],
+   images:['https://images.unsplash.com/photo-1598928636135-d146006ff4be?w=700&q=70','https://images.unsplash.com/photo-1523755231516-e43fd2e8dca5?w=700&q=70','https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=700&q=70']},
+  {id:9,title:'Triple Room with Balcony',hostel:'Green Valley Hostel',type:'Triple',price:1700,status:'available',slots:9,location:'7 mins walk from UCC main gate, quiet area',rating:4.3,
+   desc:'Unique triple room with shared balcony and garden views. Perfect for students who appreciate fresh air. Green Valley is known for excellent security.',
+   amenities:['Wi-Fi','Fan','Ensuite Bathroom','Balcony','Study Desk','Wardrobe','Security','Constant Water'],
+   images:['https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=700&q=70','https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=700&q=70','https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=700&q=70','https://images.unsplash.com/photo-1513694203232-719a280e022f?w=700&q=70']},
+  {id:10,title:'VIP Single Penthouse',hostel:'Palm Court Hostel',type:'Single',price:4500,status:'limited',slots:1,location:'2 mins walk from Science Faculty',rating:5.0,
+   desc:'Crown jewel of UCC accommodation. Top-floor VIP room with panoramic views, AC, private study lounge and all premium amenities. Only one unit available.',
+   amenities:['High-Speed Wi-Fi','Air Conditioning','Private Bathroom','Study Lounge','Mini Fridge','TV','Generator Backup','Parking','CCTV','Security Guard'],
+   images:['https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=700&q=70','https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=700&q=70','https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=700&q=70','https://images.unsplash.com/photo-1608198093002-ad4e005484ec?w=700&q=70']},
+  {id:11,title:'Standard Triple Room',hostel:'Atlantic View Hostel',type:'Triple',price:1900,status:'available',slots:12,location:'3 mins walk from Main Campus Gate',rating:4.1,
+   desc:'Spacious triple room in Atlantic View Hostel. Three students share a large room with individual study spaces. Reliable security and well-maintained common areas.',
+   amenities:['Wi-Fi','Fan','Shared Bathroom','Study Desk','Locker','Security','Water'],
+   images:['https://images.unsplash.com/photo-1519642918688-7e43b19245d8?w=700&q=70','https://images.unsplash.com/photo-1598928636135-d146006ff4be?w=700&q=70','https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=700&q=70','https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=700&q=70']},
+  {id:12,title:'Shared Quad - Value Room',hostel:"Scholar's Inn",type:'Quad',price:1000,status:'full',slots:0,location:'5 mins walk from Central Library',rating:3.7,
+   desc:'Our most economical option, now fully booked. Four students with individual study areas and shared bathrooms. Join the waiting list for next semester.',
+   amenities:['Wi-Fi','Fan','Common Bathroom','Study Area','Locker'],
+   images:['https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=700&q=70','https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=700&q=70','https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=700&q=70','https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=700&q=70']}
+];
+
+var rooms, apps, users;
+try { rooms = JSON.parse(localStorage.getItem('uccR') || 'null') || DEF; } catch(e) { rooms = DEF; }
+try { apps = JSON.parse(localStorage.getItem('uccA') || '[]'); } catch(e) { apps = []; }
+try { users = JSON.parse(localStorage.getItem('uccU') || '[]'); } catch(e) { users = []; }
+function sv() { try { localStorage.setItem('uccR', JSON.stringify(rooms)); } catch(e){} }
+function sa() { try { localStorage.setItem('uccA', JSON.stringify(apps)); } catch(e){} }
+function su2() { try { localStorage.setItem('uccU', JSON.stringify(users)); } catch(e){} }
+
+var curRoom = null, gIdx = 0, editId = null, vMode = 'g';
+var curUser = null;
+try { curUser = JSON.parse(sessionStorage.getItem('uccCU') || 'null'); } catch(e) { curUser = null; }
+if (!curUser) { curUser = window._ucuf || null; }
+
+function show(id) { document.getElementById(id).style.display = 'block'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+function showF(id) { document.getElementById(id).style.display = 'flex'; }
+
+function initApp() {
+  if (curUser) {
+    showApp();
+  } else {
+    showF('auth');
+    hide('hdr');
+    hide('mainv');
+    hide('adv');
+  }
+}
+
+function showApp() {
+  hide('auth');
+  show('hdr');
+  var ini = (curUser.fn.charAt(0) + curUser.ln.charAt(0)).toUpperCase();
+  var nav = document.getElementById('hnav');
+  nav.innerHTML = '<div class="ubadge" onclick="tUm()">' +
+    '<div class="uav">' + ini + '</div>' +
+    '<span>' + curUser.fn + '</span>' +
+    '<span style="color:rgba(255,255,255,.5);font-size:11px"> v</span>' +
+    '</div>' +
+    '<button class="nb" id="nbA" onclick="goAdmin()">Admin Panel</button>';
+  goMain();
+}
+
+function goMain() {
+  show('mainv');
+  hide('adv');
+  rndr(rooms);
+  updSt();
+}
+
+function goAdmin() {
+  hide('mainv');
+  show('adv');
+  if (sessionStorage.getItem('adm')) {
+    showAP();
+  } else {
+    show('alscr');
+    hide('apnl');
+  }
+}
+
+function doAl() {
+  if (document.getElementById('alpass').value === APASS) {
+    sessionStorage.setItem('adm','1');
+    hide('allerr');
+    showAP();
+  } else {
+    show('alerr');
+  }
+}
+
+function doAlOut() {
+  sessionStorage.removeItem('adm');
+  goMain();
+}
+
+function showAP() {
+  hide('alscr');
+  show('apnl');
+  rndrAdmin();
+  rndrStats();
+  rndrApps();
+}
+
+function stab(t) {
+  document.getElementById('tli').className = 'atab' + (t === 'li' ? ' on' : '');
+  document.getElementById('tsu').className = 'atab' + (t === 'su' ? ' on' : '');
+  document.getElementById('fli').className = 'afrm' + (t === 'li' ? ' on' : '');
+  document.getElementById('fsu').className = 'afrm' + (t === 'su' ? ' on' : '');
+  hide('lierr'); hide('suerr'); hide('suok');
+}
+
+function tpwd(id, btn) {
+  var inp = document.getElementById(id);
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'hide'; }
+  else { inp.type = 'password'; btn.textContent = 'show'; }
+}
+
+function chkStr(pw) {
+  var segs = ['sb1','sb2','sb3','sb4'];
+  var cls = ['','w','f','g','s'];
+  var lbts = ['','Weak','Fair','Good','Strong'];
+  for (var i = 0; i < 4; i++) { document.getElementById(segs[i]).className = 'sseg'; }
+  if (!pw) { document.getElementById('slbl').textContent = 'Enter a password'; return; }
+  var sc = 0;
+  if (pw.length >= 6) sc++;
+  if (pw.length >= 10) sc++;
+  if (/[A-Z]/.test(pw) && /[0-9]/.test(pw)) sc++;
+  if (/[^A-Za-z0-9]/.test(pw)) sc++;
+  for (var j = 0; j < sc; j++) { document.getElementById(segs[j]).className = 'sseg ' + cls[sc]; }
+  document.getElementById('slbl').textContent = sc > 0 ? lbts[sc] + ' password' : 'Too short';
+}
+
+function shErr(id, msg) {
+  var el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function doLi() {
+  var email = document.getElementById('liemail').value.trim().toLowerCase();
+  var pass = document.getElementById('lipass').value;
+  hide('lierr');
+  if (!email || !pass) { shErr('lierr', 'Please fill in all fields.'); return; }
+  var found = null;
+  for (var i = 0; i < users.length; i++) {
+    if (users[i].email === email && users[i].pass === pass) { found = users[i]; break; }
+  }
+  if (!found) { shErr('lierr', 'Incorrect email or password.'); return; }
+  curUser = found;
+  try { sessionStorage.setItem('uccCU', JSON.stringify(found)); } catch(e) { window._ucuf = found; }
+  showApp();
+}
+
+function doSu() {
+  var fn = document.getElementById('sufn').value.trim();
+  var ln = document.getElementById('suln').value.trim();
+  var sid = document.getElementById('susid').value.trim();
+  var email = document.getElementById('suemail').value.trim().toLowerCase();
+  var prog = document.getElementById('suprog').value.trim();
+  var pass = document.getElementById('supass').value;
+  var pass2 = document.getElementById('supass2').value;
+  hide('suerr'); hide('suok');
+  if (!fn || !ln || !email || !pass || !pass2) { shErr('suerr', 'Please fill in all required fields.'); return; }
+  if (email.indexOf('@') < 1 || email.indexOf('.') < 0) { shErr('suerr', 'Please enter a valid email address.'); return; }
+  if (pass.length < 6) { shErr('suerr', 'Password must be at least 6 characters.'); return; }
+  if (pass !== pass2) { shErr('suerr', 'Passwords do not match.'); return; }
+  for (var i = 0; i < users.length; i++) {
+    if (users[i].email === email) { shErr('suerr', 'An account with this email already exists.'); return; }
+  }
+  var nu = { id: 'USR' + Date.now(), fn: fn, ln: ln, sid: sid, email: email, prog: prog, pass: pass, joined: new Date().toISOString() };
+  users.push(nu);
+  su2();
+  var okEl = document.getElementById('suok');
+  okEl.textContent = 'Account created! Signing you in...';
+  okEl.style.display = 'block';
+  setTimeout(function() {
+    curUser = nu;
+    try { sessionStorage.setItem('uccCU', JSON.stringify(nu)); } catch(e) { window._ucuf = nu; }
+    showApp();
+  }, 1200);
+}
+
+function doUOut() {
+  curUser = null;
+  try { sessionStorage.removeItem('uccCU'); } catch(e) {}
+  window._ucuf = null;
+  cUm();
+  hide('mainv');
+  hide('adv');
+  hide('hdr');
+  showF('auth');
+  document.getElementById('liemail').value = '';
+  document.getElementById('lipass').value = '';
+  hide('lierr');
+}
+
+function tUm() {
+  var m = document.getElementById('umenu');
+  m.className = m.className === 'umenu on' ? 'umenu' : 'umenu on';
+}
+function cUm() { document.getElementById('umenu').className = 'umenu'; }
+
+document.addEventListener('click', function(e) {
+  try {
+    var t = e.target;
+    var ins = false;
+    while (t && t !== document) {
+      if (t.className && typeof t.className === 'string') {
+        if (t.className.indexOf('ubadge') >= 0 || t.className.indexOf('umenu') >= 0) { ins = true; break; }
+      }
+      t = t.parentNode;
+    }
+    if (!ins) { cUm(); }
+  } catch(ex) {}
+});
+
+function doForgot() { shErr('lierr', 'Contact brightabredu50@gmail.com with your Student ID to reset your password.'); document.getElementById('lierr').style.background = '#FFF3D0'; document.getElementById('lierr').style.color = '#B8720A'; document.getElementById('lierr').style.borderLeftColor = '#E8960A'; }
+
+function rndr(list) {
+  var g = document.getElementById('grid');
+  document.getElementById('cnt').textContent = list.length;
+  if (!list.length) { g.innerHTML = '<div class="nores"><h3>No rooms found</h3><p>Try adjusting your filters.</p></div>'; return; }
+  var h = '';
+  for (var i = 0; i < list.length; i++) {
+    var r = list[i];
+    var bl = r.status === 'available' ? 'Available' : r.status === 'limited' ? 'Limited' : 'Full';
+    var bc = r.status === 'available' ? 'av' : r.status === 'limited' ? 'lm' : 'fu';
+    var feats = '';
+    for (var j = 0; j < Math.min(4, r.amenities.length); j++) {
+      feats += '<span class="fpill">' + (ICONS[r.amenities[j]] || '') + ' ' + r.amenities[j] + '</span>';
+    }
+    h += '<div class="card" onclick="openDet(' + r.id + ')">' +
+      '<div class="cimg"><img src="' + r.images[0] + '" alt="' + r.title + '" loading="lazy">' +
+      '<span class="cbadge ' + bc + '">' + bl + '</span>' +
+      '<button class="cfav" onclick="event.stopPropagation()">&#9825;</button></div>' +
+      '<div class="cbdy"><div class="chst">' + r.hostel + '</div>' +
+      '<div class="ctit">' + r.title + '</div>' +
+      '<div class="cloc">Location: ' + r.location + '</div>' +
+      '<div class="cfeats">' + feats + '</div>' +
+      '<div class="cfoot"><div><div class="camt">GHS ' + r.price.toLocaleString() + '</div><div class="cper">per academic year</div></div>' +
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">' +
+      '<div class="crat"><span class="csta">&#9733;</span> ' + r.rating + '</div>' +
+      '<button class="ccta" onclick="event.stopPropagation();openDet(' + r.id + ')">View Room</button>' +
+      '</div></div></div></div>';
+  }
+  g.innerHTML = h;
+}
+
+function updSt() {
+  document.getElementById('stT').textContent = rooms.length;
+  document.getElementById('stA').textContent = rooms.filter(function(r) { return r.status !== 'full'; }).length;
+  var c = {Single:0,Double:0,Triple:0,Quad:0};
+  for (var i = 0; i < rooms.length; i++) { if (c[rooms[i].type] !== undefined) c[rooms[i].type]++; }
+  document.getElementById('cS').textContent = c.Single;
+  document.getElementById('cD').textContent = c.Double;
+  document.getElementById('cT').textContent = c.Triple;
+  document.getElementById('cQ').textContent = c.Quad;
+}
+
+function setV(v) {
+  vMode = v;
+  document.getElementById('vg').className = v === 'g' ? 'on' : '';
+  document.getElementById('vl').className = v === 'l' ? 'on' : '';
+  document.getElementById('grid').className = v === 'l' ? 'grid lv' : 'grid';
+}
+
+function runF() {
+  var types = [];
+  if (document.getElementById('fS').checked) types.push('Single');
+  if (document.getElementById('fD').checked) types.push('Double');
+  if (document.getElementById('fT').checked) types.push('Triple');
+  if (document.getElementById('fQ').checked) types.push('Quad');
+  var mp = parseInt(document.getElementById('psl').value);
+  var oa = document.getElementById('fAv').checked;
+  var ol = document.getElementById('fLm').checked;
+  var wf = document.getElementById('aWf').checked;
+  var ac = document.getElementById('aAC').checked;
+  var wt = document.getElementById('aWt').checked;
+  var pk = document.getElementById('aPk').checked;
+  var ht = document.getElementById('htype').value;
+  var hq = document.getElementById('hq2').value.toLowerCase();
+  var hq2 = document.getElementById('hq').value.toLowerCase();
+  var q = hq || hq2;
+  var sv = document.getElementById('srt').value;
+  var list = [];
+  for (var i = 0; i < rooms.length; i++) {
+    var r = rooms[i];
+    if (types.length && types.indexOf(r.type) < 0) continue;
+    if (r.price > mp) continue;
+    if (oa && r.status !== 'available') continue;
+    if (ol && r.status !== 'limited') continue;
+    if (wf && !hasAm(r, 'wi-fi')) continue;
+    if (ac && !hasAm(r, 'air')) continue;
+    if (wt && !hasAm(r, 'water')) continue;
+    if (pk && !hasAm(r, 'parking')) continue;
+    if (ht && r.type !== ht) continue;
+    if (q && r.title.toLowerCase().indexOf(q) < 0 && r.hostel.toLowerCase().indexOf(q) < 0 && r.location.toLowerCase().indexOf(q) < 0) continue;
+    list.push(r);
+  }
+  if (sv === 'pa') list.sort(function(a,b){return a.price-b.price;});
+  else if (sv === 'pd') list.sort(function(a,b){return b.price-a.price;});
+  else if (sv === 'ra') list.sort(function(a,b){return b.rating-a.rating;});
+  rndr(list);
+}
+
+function hasAm(r, kw) {
+  for (var i = 0; i < r.amenities.length; i++) {
+    if (r.amenities[i].toLowerCase().indexOf(kw) >= 0) return true;
+  }
+  return false;
+}
+
+function updP(v) {
+  document.getElementById('pdisp').textContent = 'Up to GHS ' + parseInt(v).toLocaleString();
+  runF();
+}
+
+function clrF() {
+  var cbs = ['fS','fD','fT','fQ','fAv','fLm','aWf','aAC','aWt','aPk'];
+  for (var i = 0; i < cbs.length; i++) { document.getElementById(cbs[i]).checked = false; }
+  document.getElementById('psl').value = 5000;
+  document.getElementById('pdisp').textContent = 'Up to GHS 5,000';
+  document.getElementById('htype').value = '';
+  document.getElementById('hq2').value = '';
+  document.getElementById('hq').value = '';
+  document.getElementById('srt').value = '';
+  rndr(rooms);
+}
+
+function openDet(id) {
+  curRoom = null;
+  for (var i = 0; i < rooms.length; i++) { if (rooms[i].id === id) { curRoom = rooms[i]; break; } }
+  if (!curRoom) return;
+  gIdx = 0;
+  updGal();
+  document.getElementById('dH').textContent = curRoom.hostel;
+  document.getElementById('dT').textContent = curRoom.title;
+  document.getElementById('dL').textContent = 'Location: ' + curRoom.location;
+  document.getElementById('dP').textContent = 'GHS ' + curRoom.price.toLocaleString();
+  document.getElementById('dDs').textContent = curRoom.desc;
+  var av = document.getElementById('dA');
+  if (curRoom.status === 'available') { av.className = 'davail'; av.style.background = '#E6F4EC'; av.style.color = '#1D6F42'; av.textContent = curRoom.slots + ' slots available'; }
+  else if (curRoom.status === 'limited') { av.className = 'davail'; av.style.background = '#FFF3D0'; av.style.color = '#B8720A'; av.textContent = 'Only ' + curRoom.slots + ' slot(s) left'; }
+  else { av.className = 'davail'; av.style.background = '#FCEBEB'; av.style.color = '#A32D2D'; av.textContent = 'Fully Booked'; }
+  var amh = '';
+  for (var j = 0; j < curRoom.amenities.length; j++) {
+    amh += '<div class="aitem">' + (ICONS[curRoom.amenities[j]] || '') + ' ' + curRoom.amenities[j] + '</div>';
+  }
+  document.getElementById('dAm').innerHTML = amh;
+  var ab = document.getElementById('appBtn');
+  if (curRoom.status === 'full') { ab.disabled = true; ab.textContent = 'Fully Booked'; }
+  else { ab.disabled = false; ab.textContent = 'Apply for This Room'; }
+  var th = document.getElementById('gTh');
+  var thh = '';
+  for (var k = 0; k < curRoom.images.length; k++) {
+    thh += '<div class="dthumb' + (k === 0 ? ' on' : '') + '" onclick="setG(' + k + ')"><img src="' + curRoom.images[k] + '" alt=""></div>';
+  }
+  th.innerHTML = thh;
+  oOv('detOv');
+}
+
+function updGal() {
+  if (!curRoom) return;
+  var m = document.getElementById('gMain');
+  m.style.opacity = '0';
+  var idx = gIdx;
+  setTimeout(function() { m.src = curRoom.images[idx]; m.style.opacity = '1'; }, 150);
+  var thumbs = document.querySelectorAll('.dthumb');
+  for (var i = 0; i < thumbs.length; i++) { thumbs[i].className = 'dthumb' + (i === gIdx ? ' on' : ''); }
+}
+function gN(d) { gIdx = (gIdx + d + curRoom.images.length) % curRoom.images.length; updGal(); }
+function setG(i) { gIdx = i; updGal(); }
+
+function openApp() {
+  if (!curRoom) return;
+  show('afWrap');
+  hide('succP');
+  document.getElementById('apImg').src = curRoom.images[0];
+  document.getElementById('apTit').textContent = curRoom.title + ' - ' + curRoom.hostel;
+  document.getElementById('apPri').textContent = 'GHS ' + curRoom.price.toLocaleString() + ' / academic year';
+  document.getElementById('appForm').reset();
+  oOv('appOv');
+}
+
+function subApp(e) {
+  e.preventDefault();
+  var btn = document.getElementById('subBtn');
+  btn.innerHTML = 'Submitting...';
+  btn.disabled = true;
+  var fd = new FormData(e.target);
+  var fn2 = fd.get('first_name');
+  var ln2 = fd.get('last_name');
+  var ref = 'REF' + Math.floor(100000 + Math.random() * 900000);
+  var payload = {
+    _subject: 'New Hostel Application - ' + curRoom.title,
+    _template: 'box',
+    _captcha: 'false',
+    Name: fn2 + ' ' + ln2,
+    StudentID: fd.get('student_id'),
+    Programme: fd.get('programme'),
+    Year: fd.get('year'),
+    AcademicYear: fd.get('acyr'),
+    Email: fd.get('email'),
+    Phone: fd.get('phone'),
+    RoomApplied: curRoom.title + ' - ' + curRoom.hostel,
+    Price: 'GHS ' + curRoom.price.toLocaleString(),
+    Reference: ref,
+    Comments: fd.get('comments') || 'None',
+    Date: new Date().toLocaleString()
+  };
+  var appRec = { id:ref, roomId:curRoom.id, roomTitle:curRoom.title, hostel:curRoom.hostel,
+    name:fn2+' '+ln2, sid:fd.get('student_id'), email:fd.get('email'),
+    phone:fd.get('phone'), prog:fd.get('programme'), yr:fd.get('year'),
+    acyr:fd.get('acyr'), comments:fd.get('comments'), date:new Date().toISOString() };
+
+  function done() {
+    apps.unshift(appRec);
+    sa();
+    document.getElementById('sref').textContent = ref;
+    hide('afWrap');
+    show('succP');
+    btn.innerHTML = 'Submit Application';
+    btn.disabled = false;
+  }
+
+  try {
+    fetch('https://formsubmit.co/' + REMAIL, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Accept':'application/json'},
+      body: JSON.stringify(payload)
+    }).then(function() { done(); }, function() { done(); });
+  } catch(ex) { done(); }
+}
+
+function rndrStats() {
+  var av=0,lm=0,fu=0;
+  for (var i=0;i<rooms.length;i++) { if(rooms[i].status==='available')av++; else if(rooms[i].status==='limited')lm++; else fu++; }
+  function sc(l,v,c) { return '<div class="asc"><div class="lbl">'+l+'</div><div class="val"'+(c?' style="color:'+c+'"':'')+'>'+v+'</div></div>'; }
+  document.getElementById('astats').innerHTML = sc('Total',rooms.length,'') + sc('Available',av,'#1D6F42') + sc('Limited',lm,'#B8720A') + sc('Full',fu,'#A32D2D') + sc('Applications',apps.length,'');
+}
+
+function rndrAdmin() {
+  var h = '';
+  for (var i=0;i<rooms.length;i++) {
+    var r=rooms[i];
+    var sc2 = r.status==='available'?'sav':r.status==='limited'?'slm':'sfu';
+    var sl = r.status.charAt(0).toUpperCase()+r.status.slice(1);
+    h += '<tr><td><img class="tdimg" src="'+r.images[0]+'" alt="" loading="lazy"></td>' +
+      '<td><div class="tdtit">'+r.title+'</div><div style="font-size:10px;color:#9E9E98">'+r.hostel+'</div></td>' +
+      '<td>'+r.type+'</td><td class="tdpri">GHS '+r.price.toLocaleString()+'</td>' +
+      '<td><span class="sbdg '+sc2+'">'+sl+'</span></td><td>'+r.slots+'</td>' +
+      '<td><div class="tdact"><button class="abtn ed" onclick="openEd('+r.id+')">Edit</button>' +
+      '<button class="abtn dl" onclick="delR('+r.id+')">Delete</button></div></td></tr>';
+  }
+  document.getElementById('atbody').innerHTML = h;
+}
+
+function rndrApps() {
+  document.getElementById('appcnt').textContent = apps.length + ' application(s)';
+  if (!apps.length) { document.getElementById('applist').innerHTML = '<div style="padding:22px;text-align:center;color:#9E9E98;font-size:13px">No applications yet.</div>'; return; }
+  var h = '';
+  for (var i=0;i<apps.length;i++) {
+    var a=apps[i];
+    var ini2 = a.name.split(' ').map(function(n){return n.charAt(0);}).join('').toUpperCase().slice(0,2);
+    h += '<div class="appitem"><div class="appav">'+ini2+'</div>' +
+      '<div class="appinf"><div class="nm">'+a.name+' ('+a.sid+')</div>' +
+      '<div class="mt">'+a.roomTitle+' | '+a.acyr+' | '+new Date(a.date).toLocaleDateString()+'</div>' +
+      '<div class="mt">Email: '+a.email+' | Phone: '+a.phone+'</div></div>' +
+      '<div style="margin-left:auto;text-align:right">' +
+      '<span class="sbdg" style="background:#FFF3D0;color:#B8720A">'+a.id+'</span>' +
+      '<div style="display:flex;gap:5px;margin-top:5px">' +
+      '<button class="abtn ap" onclick="setAS(&quot;'+a.id+'&quot;,&quot;approved&quot;)">Approve</button>' +
+      '<button class="abtn dl" onclick="setAS(&quot;'+a.id+'&quot;,&quot;rejected&quot;)">Reject</button>' +
+      '</div></div></div>';
+  }
+  document.getElementById('applist').innerHTML = h;
+}
+
+function setAS(id, st) {
+  for (var i=0;i<apps.length;i++){if(apps[i].id===id){apps[i].status=st;break;}}
+  sa(); rndrApps();
+}
+
+function delR(id) {
+  if (!confirm('Delete this room? Cannot be undone.')) return;
+  var nr = [];
+  for (var i=0;i<rooms.length;i++){if(rooms[i].id!==id)nr.push(rooms[i]);}
+  rooms = nr;
+  sv(); rndrAdmin(); rndrStats(); updSt();
+}
+
+function openAdd() {
+  editId = null;
+  document.getElementById('emTit').textContent = 'Add New Room';
+  var ids=['eT','eH','eP','eSl','eLo','eDe','eAm','eIm','eRa'];
+  for(var i=0;i<ids.length;i++){document.getElementById(ids[i]).value='';}
+  document.getElementById('eTy').value = 'Single';
+  document.getElementById('eSt').value = 'available';
+  oOv('editOv');
+}
+
+function openEd(id) {
+  var r = null;
+  for (var i=0;i<rooms.length;i++){if(rooms[i].id===id){r=rooms[i];break;}}
+  if (!r) return;
+  editId = id;
+  document.getElementById('emTit').textContent = 'Edit Room';
+  document.getElementById('eT').value = r.title;
+  document.getElementById('eH').value = r.hostel;
+  document.getElementById('eTy').value = r.type;
+  document.getElementById('eP').value = r.price;
+  document.getElementById('eSt').value = r.status;
+  document.getElementById('eSl').value = r.slots;
+  document.getElementById('eLo').value = r.location;
+  document.getElementById('eDe').value = r.desc;
+  document.getElementById('eAm').value = r.amenities.join(', ');
+  document.getElementById('eIm').value = r.images.join(', ');
+  document.getElementById('eRa').value = r.rating;
+  oOv('editOv');
+}
+
+function saveR() {
+  var t=document.getElementById('eT').value.trim();
+  var ho=document.getElementById('eH').value.trim();
+  var p=parseInt(document.getElementById('eP').value);
+  if(!t||!ho||!p){alert('Please fill in Title, Hostel, and Price.');return;}
+  var ams=document.getElementById('eAm').value.split(',');
+  var amsc=[];
+  for(var i=0;i<ams.length;i++){var a=ams[i].trim();if(a)amsc.push(a);}
+  var imgs=document.getElementById('eIm').value.split(',');
+  var imgsc=[];
+  for(var j=0;j<imgs.length;j++){var im=imgs[j].trim();if(im)imgsc.push(im);}
+  if(!imgsc.length)imgsc=['https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=700&q=70'];
+  var rd={title:t,hostel:ho,type:document.getElementById('eTy').value,price:p,
+    status:document.getElementById('eSt').value,slots:parseInt(document.getElementById('eSl').value)||0,
+    location:document.getElementById('eLo').value.trim()||'University of Cape Coast',
+    desc:document.getElementById('eDe').value.trim(),
+    amenities:amsc.length?amsc:['Wi-Fi','Security'],
+    images:imgsc.slice(0,4),
+    rating:parseFloat(document.getElementById('eRa').value)||4.0};
+  if(editId){
+    for(var k=0;k<rooms.length;k++){
+      if(rooms[k].id===editId){
+        rd.id=editId;
+        rooms[k]=rd;
+        break;
+      }
+    }
+  } else {
+    var nid=1;
+    for(var m=0;m<rooms.length;m++){if(rooms[m].id>=nid)nid=rooms[m].id+1;}
+    rd.id=nid;
+    rooms.push(rd);
+  }
+  sv(); rndrAdmin(); rndrStats(); updSt(); cOv('editOv');
+}
+
+function oOv(id) {
+  var el=document.getElementById(id);
+  el.style.display='flex';
+  el.style.opacity='0';
+  el.style.pointerEvents='all';
+  setTimeout(function(){el.style.opacity='1';},10);
+}
+
+function cOv(id) {
+  var el=document.getElementById(id);
+  el.style.opacity='0';
+  el.style.pointerEvents='none';
+  setTimeout(function(){el.style.display='none';},200);
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){cOv('detOv');cOv('appOv');cOv('editOv');cOv('profOv');cOv('myAppsOv');}
+});
+
+['detOv','appOv','editOv','profOv','myAppsOv'].forEach(function(id){
+  document.getElementById(id).addEventListener('click',function(e){
+    if(e.target===this)cOv(id);
+  });
+});
+
+initApp();
+</script>
+</body>
+</html>
